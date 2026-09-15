@@ -1,17 +1,33 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useCart } from "@/src/context/CartContext";
-import { createWhatsAppOrder } from "@/src/utils/createWhatsAppOrder";
 
 const deliveryCharge = 40;
 
 export function CartReview() {
   const { items, increaseQuantity, decreaseQuantity, totalItems, totalPrice } = useCart();
   const grandTotal = totalPrice + (items.length > 0 ? deliveryCharge : 0);
-  const confirmOrder = () => {
-    window.location.assign(createWhatsAppOrder(items, totalPrice));
-  };
 
-  return <section className="bg-[var(--cream)] pb-16 pt-10 sm:pb-20 sm:pt-14"><div className="section-shell"><div className="mb-8 flex items-end justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--green)]">Almost there</p><h1 className="serif mt-3 text-5xl font-medium leading-none tracking-[-0.05em] text-[var(--navy)]">Review your<br /><em className="text-[var(--green)]">order.</em></h1></div><p className="hidden pb-1 text-sm text-slate-400 sm:block">{totalItems} {totalItems === 1 ? "item" : "items"}</p></div>{items.length === 0 ? <div className="rounded-3xl border border-[var(--line)] bg-white px-6 py-16 text-center shadow-sm"><p className="text-lg font-bold text-[var(--navy)]">Your cart is waiting for something fresh.</p><p className="mt-2 text-sm text-slate-500">Add your favourite cuts to get started.</p><a href="/products" className="mt-7 inline-flex rounded-full bg-[var(--navy)] px-6 py-3 text-sm font-bold text-white">Browse Products</a></div> : <div className="grid gap-8 lg:grid-cols-[1fr_360px] lg:items-start"><div className="space-y-3">{items.map(({ product, quantity }) => <article key={product.id} className="flex gap-4 rounded-2xl border border-[var(--line)] bg-white p-3 shadow-sm sm:gap-5 sm:p-4"><div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl sm:h-28 sm:w-28" style={{ backgroundColor: product.accent }}><Image src={product.image} alt={product.name} fill sizes="112px" className="object-cover mix-blend-multiply" /></div><div className="flex min-w-0 flex-1 flex-col justify-between py-1"><div><h2 className="truncate text-sm font-bold text-[var(--navy)] sm:text-base">{product.name}</h2><p className="mt-1 text-xs text-slate-400">{product.weight}</p></div><div className="flex items-end justify-between gap-3"><p className="text-base font-bold text-[var(--green)]">₹{product.price * quantity}</p><div className="flex items-center gap-2 rounded-full bg-[var(--mint)] p-1 text-[var(--navy)]"><button aria-label={`Decrease ${product.name}`} onClick={() => decreaseQuantity(product.id)} className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-base font-bold">−</button><span className="min-w-4 text-center text-xs font-bold">{quantity}</span><button aria-label={`Increase ${product.name}`} onClick={() => increaseQuantity(product.id)} className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--green)] text-base font-bold text-white">+</button></div></div></div></article>)}</div><aside className="rounded-2xl border border-[var(--line)] bg-white p-5 shadow-sm sm:p-6"><h2 className="text-lg font-bold text-[var(--navy)]">Order summary</h2><div className="mt-6 space-y-4 text-sm"><div className="flex justify-between text-slate-500"><span>Subtotal</span><span className="font-semibold text-[var(--navy)]">₹{totalPrice}</span></div><div className="flex justify-between text-slate-500"><span>Delivery Charge</span><span className="font-semibold text-[var(--navy)]">₹{deliveryCharge}</span></div><div className="border-t border-dashed border-[var(--line)] pt-4"><div className="flex justify-between text-base font-bold text-[var(--navy)]"><span>Grand Total</span><span>₹{grandTotal}</span></div></div></div><button onClick={confirmOrder} className="mt-7 w-full rounded-full bg-[var(--green)] px-5 py-4 text-sm font-bold text-white shadow-lg shadow-green-900/10 transition-transform hover:-translate-y-0.5">Confirm Order</button><p className="mt-3 text-center text-[11px] leading-5 text-slate-400">Payment options will be available at checkout.</p></aside></div>}</div></section>;
+  return (
+    <section className="bg-[var(--cream)] pb-16 pt-10 sm:pb-20 sm:pt-14">
+      <div className="section-shell">
+        <div className="mb-8 flex items-end justify-between gap-4">
+          <div><p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--green)]">Almost there</p><h1 className="serif mt-3 text-5xl font-medium leading-none tracking-[-0.05em] text-[var(--navy)]">Review your<br /><em className="text-[var(--green)]">order.</em></h1></div>
+          <p className="hidden pb-1 text-sm text-slate-400 sm:block">{totalItems} {totalItems === 1 ? "item" : "items"}</p>
+        </div>
+        {items.length === 0 ? (
+          <div className="rounded-3xl border border-[var(--line)] bg-white px-6 py-16 text-center shadow-sm"><p className="text-lg font-bold text-[var(--navy)]">Your cart is waiting for something fresh.</p><p className="mt-2 text-sm text-slate-500">Add your favourite cuts to get started.</p><Link href="/products" className="mt-7 inline-flex rounded-full bg-[var(--navy)] px-6 py-3 text-sm font-bold text-white">Browse Products</Link></div>
+        ) : (
+          <div className="grid gap-8 lg:grid-cols-[1fr_360px] lg:items-start">
+            <div className="space-y-3">
+              {items.map(({ product, quantity }) => <article key={product.id} className="flex gap-4 rounded-2xl border border-[var(--line)] bg-white p-3 shadow-sm sm:gap-5 sm:p-4"><div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl sm:h-28 sm:w-28" style={{ backgroundColor: product.accent }}><Image src={product.image} alt={product.name} fill sizes="112px" className="object-cover mix-blend-multiply" /></div><div className="flex min-w-0 flex-1 flex-col justify-between py-1"><div><h2 className="truncate text-sm font-bold text-[var(--navy)] sm:text-base">{product.name}</h2><p className="mt-1 text-xs text-slate-400">{product.weight}</p></div><div className="flex items-end justify-between gap-3"><p className="text-base font-bold text-[var(--green)]">₹{product.price * quantity}</p><div className="flex items-center gap-2 rounded-full bg-[var(--mint)] p-1 text-[var(--navy)]"><button type="button" onClick={() => decreaseQuantity(product.id)} className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-lg">−</button><span className="min-w-4 text-center text-sm font-bold">{quantity}</span><button type="button" onClick={() => increaseQuantity(product.id)} className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-lg">+</button></div></div></div></article>)}
+            </div>
+            <aside className="rounded-3xl border border-[var(--line)] bg-white p-6 shadow-sm"><h2 className="text-lg font-bold text-[var(--navy)]">Order summary</h2><div className="mt-6 space-y-3 text-sm"><div className="flex justify-between text-slate-500"><span>Subtotal</span><span className="font-semibold text-[var(--navy)]">₹{totalPrice}</span></div><div className="flex justify-between text-slate-500"><span>Delivery Charge</span><span className="font-semibold text-[var(--navy)]">₹{deliveryCharge}</span></div><div className="border-t border-[var(--line)] pt-4"><div className="flex justify-between text-base font-bold text-[var(--navy)]"><span>Grand Total</span><span className="text-[var(--green)]">₹{grandTotal}</span></div></div></div><Link href="/checkout" className="mt-7 flex w-full items-center justify-center rounded-full bg-[var(--green)] px-5 py-3.5 text-sm font-bold text-white transition hover:brightness-95">Proceed to Checkout</Link></aside>
+          </div>
+        )}
+      </div>
+    </section>
+  );
 }

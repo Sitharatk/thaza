@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { products } from "@/data/products";
-import { useCart } from "@/src/context/CartContext";
 import { ProductCard } from "./ProductCard";
 
 const categories = ["All Items", "Chicken", "Beef", "Mutton", "Ready to Cook"] as const;
@@ -10,7 +9,6 @@ const categories = ["All Items", "Chicken", "Beef", "Mutton", "Ready to Cook"] a
 export function ProductCatalogue() {
   const [activeCategory, setActiveCategory] = useState<(typeof categories)[number]>("All Items");
   const filteredProducts = activeCategory === "All Items" ? products : products.filter((product) => product.category === activeCategory);
-  const { totalItems, totalPrice } = useCart();
 
   return <>
     <section className="bg-[var(--cream)] pb-28 pt-10 sm:pb-16 sm:pt-14">
@@ -22,6 +20,5 @@ export function ProductCatalogue() {
         {filteredProducts.length === 0 && <p className="py-16 text-center text-sm text-slate-500">More fresh cuts are coming soon.</p>}
       </div>
     </section>
-    <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-[var(--line)] bg-white/95 px-4 py-3 shadow-[0_-8px_24px_rgba(16,45,66,0.1)] backdrop-blur sm:hidden"><div className="mx-auto flex max-w-md items-center justify-between gap-4"><div><p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">{totalItems} {totalItems === 1 ? "item" : "items"}</p><p className="mt-0.5 text-lg font-bold text-[var(--navy)]">₹{totalPrice}</p></div><a href="/cart" className="flex items-center gap-3 rounded-full bg-[var(--green)] px-5 py-3 text-sm font-bold text-white">View Cart <span aria-hidden="true">→</span></a></div></div>
   </>;
 }
