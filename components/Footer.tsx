@@ -1,0 +1,3 @@
+import { Icon } from "./Icon";
+
+export function Footer() { return <footer className="bg-[#0b2233] py-8 text-white"><div className="section-shell flex flex-col justify-between gap-5 text-xs text-white/50 sm:flex-row sm:items-center"><a href="#home" className="flex items-center gap-2 text-lg font-bold text-white"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--green)]"><Icon name="leaf" size={15} /></span>thaza<span className="text-[var(--green)]">.</span></a><p>Fresh food, thoughtfully delivered.</p><p>© 2024 Thaza. All rights reserved.</p></div></footer>; }

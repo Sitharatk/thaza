@@ -1,0 +1,11 @@
+"use client";
+
+import Image from "next/image";
+import type { Product } from "@/types/product";
+import { useCart } from "@/src/context/CartContext";
+
+export function ProductCard({ product }: { product: Product }) {
+	const { items, addItem, increaseQuantity, decreaseQuantity } = useCart();
+	const quantity = items.find((item) => item.product.id === product.id)?.quantity ?? 0;
+	return <article className="group overflow-hidden rounded-2xl border border-[var(--line)] bg-white transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50"><div className="relative aspect-[1.15] overflow-hidden" style={{ backgroundColor: product.accent }}><Image src={product.image} alt={product.name} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 280px" className="object-cover mix-blend-multiply transition-transform duration-500 group-hover:scale-105" /><span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--green)]">{product.category}</span></div><div className="p-4"><h3 className="text-[15px] font-bold text-[var(--navy)]">{product.name}</h3><p className="mt-1 text-xs text-slate-400">{product.weight}</p><div className="mt-3 flex items-center justify-between gap-2"><p className="text-base font-bold text-[var(--green)]">₹{product.price}</p>{quantity === 0 ? <button aria-label={`Add ${product.name} to cart`} onClick={() => addItem(product)} className="rounded-full bg-[var(--navy)] px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[var(--green)]">Add</button> : <div className="flex items-center gap-2 rounded-full bg-[var(--mint)] p-1 text-[var(--navy)]"><button aria-label={`Decrease ${product.name}`} onClick={() => decreaseQuantity(product.id)} className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-base font-bold">−</button><span className="min-w-4 text-center text-xs font-bold">{quantity}</span><button aria-label={`Increase ${product.name}`} onClick={() => increaseQuantity(product.id)} className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--green)] text-base font-bold">+</button></div>}</div></div></article>;
+}
