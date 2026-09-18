@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { products } from "@/data/products";
+import type { Product } from "@/types/product";
 import { ProductCard } from "./ProductCard";
 
 const categories = ["All Items", "Chicken", "Beef", "Mutton", "Ready to Cook"] as const;
 
-export function ProductCatalogue() {
+export function ProductCatalogue({ products }: { products: Product[] }) {
   const [activeCategory, setActiveCategory] = useState<(typeof categories)[number]>("All Items");
   const filteredProducts = activeCategory === "All Items" ? products : products.filter((product) => product.category === activeCategory);
 

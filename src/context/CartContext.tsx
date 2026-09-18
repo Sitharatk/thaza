@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import type { Product } from "@/types/product";
 
 export type CartItem = { product: Product; quantity: number };
@@ -13,6 +14,7 @@ type CartContextValue = {
   decreaseQuantity: (productId: string) => void;
   totalItems: number;
   totalPrice: number;
+  refreshPrices: () => Promise<void>;
 };
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
@@ -20,6 +22,16 @@ const CartContext = createContext<CartContextValue | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
+  const pathname = usePathname();
+  const refreshPrices = useCallback(async () => {
+    const response = await fetch("/api/products", { cache: "no-store" });
+    if (!response.ok) throw new Error("Current prices could not be loaded. Please try again.");
+    const products: Product[] = await response.json();
+    setItems((current) => current.flatMap((item) => {
+      const product = products.find((candidate) => candidate.id === item.product.id);
+      return product ? [{ ...item, product }] : [];
+    }));
+  }, []);
 
   useEffect(() => {
     const hydrateCart = () => {
@@ -39,6 +51,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isHydrated) window.localStorage.setItem("thaza-cart", JSON.stringify(items));
   }, [isHydrated, items]);
+
+  useEffect(() => {
+    if (!isHydrated || pathname.startsWith("/admin")) return;
+    const refresh = () => { void refreshPrices().catch(() => { /* Checkout validates current prices before saving. */ }); };
+    refresh();
+    window.addEventListener("focus", refresh);
+    return () => window.removeEventListener("focus", refresh);
+  }, [isHydrated, pathname, refreshPrices]);
 
   const addItem = (product: Product) => {
     setItems((current) => {
@@ -63,7 +83,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     decreaseQuantity,
     totalItems: items.reduce((total, item) => total + item.quantity, 0),
     totalPrice: items.reduce((total, item) => total + item.product.price * item.quantity, 0),
-  }), [items]);
+    refreshPrices,
+  }), [items, refreshPrices]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

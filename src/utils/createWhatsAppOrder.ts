@@ -11,21 +11,26 @@ export type CustomerDetails = {
   pincode: string;
 };
 
-export function createWhatsAppOrder(
-  customer: CustomerDetails,
-  cartItems: CartItem[],
-  subtotal: number,
-  deliveryCharge: number,
-  grandTotal: number,
-  paymentMethod: string,
-) {
+export type OrderMessageData = {
+  orderNumber: string;
+  customer: CustomerDetails;
+  cartItems: CartItem[];
+  subtotal: number;
+  deliveryCharge: number;
+  grandTotal: number;
+  paymentMethod: string;
+};
+
+function createOrderMessage({ orderNumber, customer, cartItems, subtotal, deliveryCharge, grandTotal, paymentMethod }: OrderMessageData, heading: string) {
   const itemLines = cartItems.map(({ product, quantity }) => {
     const itemTotal = product.price * quantity;
     return `• ${product.name} (${product.weight}) x${quantity} - ₹${itemTotal}`;
   });
 
-  const message = [
-    "🛍️ *New Order from Thaza*",
+  return [
+    heading,
+    "",
+    `*Order ID:* ${orderNumber}`,
     "",
     "👤 *Customer Details*",
     "",
@@ -39,7 +44,7 @@ export function createWhatsAppOrder(
     customer.city,
     `Kerala - ${customer.pincode}`,
     "",
-    "📦 *Items:*",
+    "📦 *Items*",
     "",
     ...itemLines,
     "",
@@ -53,6 +58,26 @@ export function createWhatsAppOrder(
     "",
     paymentMethod,
   ].join("\n");
+}
+
+export function createAdminOrderMessage(data: OrderMessageData) {
+  return createOrderMessage(data, "✅ *New Order from Thaza*");
+}
+
+export function createCustomerOrderMessage(data: OrderMessageData) {
+  return createOrderMessage(data, "✅ *Order Confirmation from Thaza*");
+}
+
+export function createWhatsAppOrder(
+  customer: CustomerDetails,
+  cartItems: CartItem[],
+  subtotal: number,
+  deliveryCharge: number,
+  grandTotal: number,
+  paymentMethod: string,
+  orderNumber: string,
+) {
+  const message = createAdminOrderMessage({ orderNumber, customer, cartItems, subtotal, deliveryCharge, grandTotal, paymentMethod });
 
   return `https://wa.me/${THAZA_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
